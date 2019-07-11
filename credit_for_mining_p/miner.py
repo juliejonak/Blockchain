@@ -57,7 +57,7 @@ if __name__ == '__main__':
     if file_exists('my_id.txt'):
         # Set the ID For mining
         id_file = open("my_id.txt", "r")
-        mining_id = id_file.read()
+        miner_id = id_file.read()
 
     else:
         # Creates and opens my_id.txt file
@@ -68,12 +68,11 @@ if __name__ == '__main__':
 
     while True:
         # Get the last proof from the server
-        print(mining_id)
         r = requests.get(url=node + "/last_proof")
         data = r.json()
         new_proof = proof_of_work(data.get('proof'))
 
-        post_data = {"proof": new_proof}
+        post_data = {"proof": new_proof, "miner_id": miner_id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()

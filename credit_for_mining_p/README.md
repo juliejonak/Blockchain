@@ -14,7 +14,7 @@ We need to fix this to appropriately give credit where credit is due.
 *Server*
 Modify the server we created to:
 * Receive an `id` from a `mine` request.
-* Record that ID as the `sender` in the transaction that creates the coin.
+* Record that ID as the `recipient` in the transaction that creates the coin.
 
 *Client*
 Modify the client we created to:
