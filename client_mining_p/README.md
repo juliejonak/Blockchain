@@ -12,7 +12,6 @@ Modify the server we created to:
 * Remove the `proof_of_work` function from the server.
 * Change `valid_proof` to require *6* leading zeroes.
 * Add an endpoint called `last_proof` that returns the `proof` of the last block in the chain
-
 * Modify the `mine` endpoint to instead receive and validate or reject a new proof sent by a client.
 * Return a message indicating success or failure.  Remember, a valid proof should fail for all senders except the first.
 

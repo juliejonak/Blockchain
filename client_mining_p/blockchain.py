@@ -14,7 +14,7 @@ class Blockchain(object):
         self.current_transactions = []
         self.nodes = set()
 
-        self.new_block(previous_hash=1, proof=100)
+        self.new_block(previous_hash=1, proof=99)
 
     def new_block(self, proof, previous_hash=None):
         """
@@ -142,17 +142,29 @@ blockchain = Blockchain()
 @app.route('/mine', methods=['POST'])
 def mine():
     # Receive and validate or reject a new proof sent by a client
-    # Return a message indicating success or failure
-    # Only the first sender of that valid proof instance should succeed
     values = request.get_json()
 
     required = ["proof"]
     if not all(k in values for k in required):
         return 'Missing Values', 400
-    
-    guess_proof = values["proof"]
-    
-    response = {'message': f'Received proof: {guess_proof}'}
+
+    # Check if passed proof passes
+    successful_proofs = [blockchain.last_block.get('proof')]
+    check_guess = blockchain.valid_proof(blockchain.last_block.get("proof"), values["proof"])
+    if check_guess == True:
+        # Check if proof aleady found. 
+        if values['proof'] not in successful_proofs:
+            # If not, adds to list of passed proofs and sends success message
+            successful_proofs.append(values["proof"])
+            response = {'message': 'Success!'}
+        # If already in list, sends failure message indicating successful proof but found by another user first
+        else:
+            response = {'message': 'Fail: Proof already found'}
+
+    # Proof failed
+    else: 
+        response = {'message': 'Fail'}
+
     return jsonify(response), 201
 
 
