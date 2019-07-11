@@ -79,7 +79,7 @@ class Blockchain(object):
     @staticmethod
     def valid_proof(last_proof, proof):
         """
-        Validates the Proof:  Does hash(last_proof, proof) contain 4
+        Validates the Proof:  Does hash(last_proof, proof) contain 6
         leading zeroes?
         """
         guess = f'{last_proof}{proof}'.encode()
@@ -135,44 +135,35 @@ def mine():
         return 'Missing Value: proof', 400
 
     # Check if passed proof passes
-    successful_proofs = [blockchain.last_block.get('proof')]
-    check_guess = blockchain.valid_proof(blockchain.last_block.get("proof"), values["proof"])
-    
-    if check_guess == True:
-        # Check if proof aleady found. 
-        if values['proof'] not in successful_proofs:
-            # If not, adds to list of passed proofs and sends success message
-            successful_proofs.append(values["proof"])
+    last_block = blockchain.last_block
+    last_proof = last_block["proof"]
 
-            # We must receive a reward for finding the proof.
-            # The sender is "0" to signify that this node has mined a new coin
-            blockchain.new_transaction(
-                sender="0",
-                recipient=node_identifier,
-                amount=1,
-            )
+    if blockchain.valid_proof(last_proof, values["proof"]):
+        # We must receive a reward for finding the proof.
+        # The sender is "0" to signify that this node has mined a new coin
+        blockchain.new_transaction(
+            sender="0",
+            recipient=node_identifier,
+            amount=1,
+        )
 
-            # Forge the new BLock by adding it to the chain
-            previous_hash = blockchain.hash(last_block)
-            block = blockchain.new_block(proof, previous_hash)
+        # Forge the new BLock by adding it to the chain
+        previous_hash = blockchain.hash(last_block)
+        block = blockchain.new_block(values["proof"], previous_hash)
 
-            response = {
-                'message': "New Block Forged",
-                'index': block['index'],
-                'transactions': block['transactions'],
-                'proof': block['proof'],
-                'previous_hash': block['previous_hash'],
-            }
-
-        # If guess is already in list, sends failure message indicating successful proof but found by another user first
-        else:
-            response = {'message': 'Fail: Proof already found'}
+        response = {
+            'message': "New Block Forged",
+            'index': block['index'],
+            'transactions': block['transactions'],
+            'proof': block['proof'],
+            'previous_hash': block['previous_hash'],
+        }
+        return jsonify(response), 201
 
     # Proof failed
     else: 
-        response = {'message': 'Fail'}
-
-    return jsonify(response), 201
+        response = {'message': 'Proof was already found or invalid'}
+        return jsonify(response), 200
 
 
 @app.route('/transactions/new', methods=['POST'])

@@ -1,6 +1,12 @@
 # Credit for mining
 
-We've forgotten something important!  Miners want credit for the electricity they spend to mine a new block.  Right now, the server is simply recording a `0` as the sender.  We need to fix this to appropriately give credit where credit is due. 
+We've forgotten something important!  Miners want credit for the electricity they spend to mine a new block.  Right now, the server is simply recording a `0` as the sender.  
+
+In mine(): `recipient = node_identifier`
+
+The server is getting the coin. We need to modify the server and client so that the miner will send a unique UID identifier, removing the dashes, and the server will record that transaction as that is who is getting the coin.
+
+We need to fix this to appropriately give credit where credit is due. 
 
 
 # Task List
